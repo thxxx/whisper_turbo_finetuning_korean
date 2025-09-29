@@ -46,8 +46,8 @@ def parse_args():
     p.add_argument("--epochs", type=int, default=3)
     p.add_argument("--train_bs", type=int, default=8)
     p.add_argument("--eval_bs", type=int, default=8)
-    p.add_argument("--lr", type=float, default=1e-5)
-    p.add_argument("--warmup_ratio", type=float, default=0.05)
+    p.add_argument("--lr", type=float, default=2e-6)
+    p.add_argument("--warmup_ratio", type=float, default=0.01)
     p.add_argument("--weight_decay", type=float, default=0.01)
     p.add_argument("--audio_column_name", type=str, default="audio")  # Emilia 류면 "mp3" 등으로 바꾸기
     p.add_argument("--language", type=str, default=os.getenv("LANGUAGE", "korean"))
@@ -202,7 +202,7 @@ def main():
 
     # 프로세서 & 모델
     processor = WhisperProcessor.from_pretrained(args.model_name)
-    model = WhisperForConditionalGeneration.from_pretrained(args.model_name)
+    model = WhisperForConditionalGeneration.from_pretrained("/home/khj6051/whisper/whisper-turbo-ko-fifth/checkpoint-6333/")
 
     # 학습 중 캐시 비활성화 (GC/DP 이슈 회피)
     model.config.use_cache = False
@@ -257,6 +257,7 @@ def main():
         per_device_eval_batch_size=args.eval_bs,
         gradient_accumulation_steps=1,
         learning_rate=args.lr,
+        # lr_scheduler_type="cosine",
         warmup_ratio=args.warmup_ratio,
         weight_decay=args.weight_decay,
         num_train_epochs=args.epochs,
